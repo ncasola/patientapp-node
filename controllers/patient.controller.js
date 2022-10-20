@@ -1,6 +1,6 @@
 const db = require("../models");
-const Patient = db.patients;
-const Appointment = db.appointments;
+const Patient = db["patient"];
+const Appointment = db["appointment"];
 const Op = db.Sequelize.Op;
 
 const { calculateLimitAndOffset } = require ('../helpers/pagination');

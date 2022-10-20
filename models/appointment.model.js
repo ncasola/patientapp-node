@@ -10,7 +10,10 @@ module.exports = (sequelize, Sequelize) => {
     patientId: {
       type: DataTypes.INTEGER
     },
-    dateAppointment: {
+    dateAppointmentStart: {
+        type: DataTypes.DATE
+    },
+    dateAppointmentEnd: {
         type: DataTypes.DATE
     },
     status: {

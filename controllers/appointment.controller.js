@@ -1,6 +1,6 @@
 const db = require("../models");
-const Appointment = db.appointments;
-const Patient = db.patients;
+const Appointment = db["appointment"];
+const Patient = db["patient"];
 const { calculateLimitAndOffset } = require ('../helpers/pagination');
 
 // Create and Save a new Appointment
@@ -16,7 +16,8 @@ exports.create = (req, res) => {
   // Create a Appointment
   const appointment = {
     patientId: req.body.patientId,
-    dateAppointment: req.body.dateAppointment,
+    dateAppointmentStart: req.body.dateAppointmentStart,
+    dateAppointmentEnd: req.body.dateAppointmentEnd,
     status: req.body.status,
     observations: req.body.observations
   };

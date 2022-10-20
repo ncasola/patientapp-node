@@ -1,7 +1,7 @@
 const db = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const User = db.users;
+const User = db["user"];
 
 // Create and Save a new Book
 exports.create = (req, res) => {
@@ -10,9 +10,7 @@ exports.create = (req, res) => {
         return res.status(400).json({error: 'Email ya registrado'})
     }
 
-    // hash contraseña
-    const salt = bcrypt.genSalt(10);
-    const password = bcrypt.hash(req.body.password, salt);
+    const password = bcrypt.hash(req.body.password.toString(), 10);
 
     const user = new User({
         name: req.body.name,
@@ -42,9 +40,8 @@ exports.findOne = async (req, res) => {
 
 // Find a single Book with an id
 exports.login = async (req, res) => {
-    const user = await User.findOne({email: req.body.email});
+    const user = await User.findOne({ where: { email: req.body.email } });
     if (!user) return res.status(400).json({error: 'Usuario no encontrado'});
-
     const validPassword = await bcrypt.compare(req.body.password, user.password);
     if (!validPassword) return res.status(400).json({error: 'contraseña no válida'})
     // create token
