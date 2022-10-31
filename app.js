@@ -3,13 +3,14 @@ const cors = require('cors');
 const db = require("./models");
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
-
+const authenticate = require('./middlewares/authentication');
 const port = process.env.PORT || 3001;
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(cookieParser());
+app.use(authenticate);
 
 db.sequelize.sync().then(r => console.log("Tablas sync") );
 

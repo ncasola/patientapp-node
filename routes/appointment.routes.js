@@ -1,28 +1,27 @@
-const verifyToken = require("../middlewares/verifyToken");
+const appointments = require("../controllers/appointment.controller.js");
+const permit = require("../middlewares/authorization");
 module.exports = app => {
-  const appointments = require("../controllers/appointment.controller.js");
-  const verifyToken = require('../middlewares/verifyToken');
   const router = require("express").Router();
 
   // Create a new Appointment
-  router.post("/", verifyToken, appointments.create);
+  router.post("/", permit('admin', 'worker'), appointments.create);
 
   // Retrieve all Appointments with pagination
-  router.get("/", verifyToken, appointments.findAllPaged);
+  router.get("/", permit('admin', 'worker'), appointments.findAllPaged);
 
   // Retrieve all Appointments
-  router.get("/all", verifyToken, appointments.findAll);
+  router.get("/all", permit('admin', 'worker'), appointments.findAll);
 
   // Retrieve a single Appointment with id
-  router.get("/:id", verifyToken, appointments.findOne);
+  router.get("/:id", permit('admin', 'worker'), appointments.findOne);
 
   // Update a Appointment with id
-  router.put("/:id", verifyToken, appointments.update);
+  router.put("/:id", permit('admin', 'worker'), appointments.update);
 
   // Delete a Appointment with id
-  router.delete("/:id", verifyToken, appointments.delete);
+  router.delete("/:id", permit('admin', 'worker'), appointments.delete);
 
   // Delete all Appointments
-  router.delete("/", verifyToken, appointments.deleteAll);
+  router.delete("/", permit('admin', 'worker'), appointments.deleteAll);
   app.use('/api/appointments', router);
 };

@@ -29,6 +29,9 @@ fs
 db["patient"].hasMany(db["appointment"]);
 db["appointment"].belongsTo(db["patient"]);
 
+db["user"].belongsToMany(db["roles"], { through: "user_roles"});
+db["roles"].belongsToMany(db["user"], { through: "user_roles"});
+
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
