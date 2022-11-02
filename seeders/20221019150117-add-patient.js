@@ -1,28 +1,26 @@
 'use strict';
-
+const { faker } = require('@faker-js/faker');
 /** @type {import('sequelize-cli').Migration} */
+
+const patients = [...Array(100)].map((patient) => (
+  {
+    name: faker.name.firstName(),
+    lastname: faker.name.lastName(),
+    email: faker.internet.email(),
+    phone: faker.phone.number(),
+    address: faker.address.streetAddress(),
+    city: faker.address.city(),
+    state: faker.address.state(),
+    country: faker.address.country(),
+    zip: faker.address.zipCode(),
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+));
+
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.bulkInsert(
-      "patients",
-      [
-        {
-          name: "Juan",
-          lastName: "Perez",
-          email: "nestor@gmail.com",
-          phone: "671223155",
-          address: "Pasaje 1",
-          city: "Madrid",
-          state: "Madrid",
-          zip: "28001",
-          country: "España",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-
-        },
-      ],
-      {}
-    );
+    await queryInterface.bulkInsert('patients', patients, {});
   },
 
   async down (queryInterface, Sequelize) {

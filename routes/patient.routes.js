@@ -6,8 +6,11 @@ module.exports = app => {
   // Create a new Patient
   router.post("/", permit('admin', 'worker'), patients.create);
 
+  // Retrieve all Patients with pagination
+  router.get("/", permit('admin', 'worker'), patients.findAllPaged);
+
   // Retrieve all Patients
-  router.get("/", permit('admin', 'worker'), patients.findAll);
+  router.get("/all", permit('admin', 'worker'), patients.findAll);
 
   // Retrieve a single Patient with id
   router.get("/:id", permit('admin', 'worker'), patients.findOne);

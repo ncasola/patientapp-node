@@ -3,14 +3,14 @@ const Patient = db["patient"];
 const Appointment = db["appointment"];
 const Op = db.Sequelize.Op;
 
-const { calculateLimitAndOffset } = require ('../helpers/pagination');
+const { calculateLimitAndOffset } = require("../helpers/pagination");
 
 // Create and Save a new Patient
 exports.create = (req, res) => {
   // Validate request
   if (!req.body.email) {
     res.status(400).send({
-      message: "Content can not be empty!"
+      message: "Content can not be empty!",
     });
     return;
   }
@@ -25,38 +25,35 @@ exports.create = (req, res) => {
     city: req.body.city,
     state: req.body.state,
     country: req.body.country,
-    zip: req.body.zip
+    zip: req.body.zip,
   };
 
   // Save Patient in the database
   Patient.create(patient)
-    .then(data => {
+    .then((data) => {
       res.send(data);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
         message:
-          err.message || "Some error occurred while creating the Patient."
+          err.message || "Some error occurred while creating the Patient.",
       });
     });
 };
 
 // Retrieve all Patients from the database.
-exports.findAll = (req, res) => {
-  const { page, size, search } = req.query;
+exports.findAllPaged = (req, res) => {
+  const { page, size, search, searchBy } = req.query;
+  const condition =
+    search && searchBy ? { [searchBy]: { [Op.like]: `%${search}%` } } : null;
   const { offset, limit } = calculateLimitAndOffset(page, size);
-  Patient.findAndCountAll(
-    {
-      where: {
-        name: {
-          [Op.like]: `%${search}%`
-        }
-      },
-      limit: limit, 
-      offset: offset, 
-      include: Appointment
-    })
-    .then(data => {
+  Patient.findAndCountAll({
+    where: condition,
+    limit: limit,
+    offset: offset,
+    include: Appointment,
+  })
+    .then((data) => {
       const { count, rows } = data;
       const response = {
         items: rows,
@@ -64,30 +61,45 @@ exports.findAll = (req, res) => {
       };
       res.send(response);
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
         message:
-          err.message || "Some error occurred while retrieving patients."
+          err.message || "Some error occurred while retrieving patients.",
       });
+    });
+};
+
+exports.findAll = (req, res) => {
+  Patient.findAll({ attributes: ['id', 'name', 'lastname'] })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res
+        .status(500)
+        .send({
+          message:
+            err.message || "Some error occurred while retrieving patients.",
+        });
     });
 };
 
 // Find a single Patient with an id
 exports.findOne = (req, res) => {
   const id = req.params.id;
-  Patient.findByPk(id, {include: Appointment})
-    .then(data => {
+  Patient.findByPk(id)
+    .then((data) => {
       if (data) {
         res.send(data);
       } else {
         res.status(404).send({
-          message: `Cannot find Patient with id=${id}.`
+          message: `Cannot find Patient with id=${id}.`,
         });
       }
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message: "Error retrieving Patient with id=" + id
+        message: "Error retrieving Patient with id=" + id,
       });
     });
 };
@@ -97,22 +109,22 @@ exports.update = (req, res) => {
   const id = req.params.id;
 
   Patient.update(req.body, {
-    where: { id: id }
+    where: { id: id },
   })
-    .then(num => {
+    .then((num) => {
       if (num == 1) {
         res.send({
-          message: "Patient was updated successfully."
+          message: "Patient was updated successfully.",
         });
       } else {
         res.send({
-          message: `Cannot update Patient with id=${id}. Maybe Patient was not found or req.body is empty!`
+          message: `Cannot update Patient with id=${id}. Maybe Patient was not found or req.body is empty!`,
         });
       }
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message: "Error updating Patient with id=" + id
+        message: "Error updating Patient with id=" + id,
       });
     });
 };
@@ -122,22 +134,22 @@ exports.delete = (req, res) => {
   const id = req.params.id;
 
   Patient.destroy({
-    where: { id: id }
+    where: { id: id },
   })
-    .then(num => {
+    .then((num) => {
       if (num == 1) {
         res.send({
-          message: "Patient was deleted successfully!"
+          message: "Patient was deleted successfully!",
         });
       } else {
         res.send({
-          message: `Cannot delete Patient with id=${id}. Maybe Patient was not found!`
+          message: `Cannot delete Patient with id=${id}. Maybe Patient was not found!`,
         });
       }
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
-        message: "Could not delete Patient with id=" + id
+        message: "Could not delete Patient with id=" + id,
       });
     });
 };
@@ -146,16 +158,15 @@ exports.delete = (req, res) => {
 exports.deleteAll = (req, res) => {
   Patient.destroy({
     where: {},
-    truncate: false
+    truncate: false,
   })
-    .then(nums => {
+    .then((nums) => {
       res.send({ message: `${nums} Patients were deleted successfully!` });
     })
-    .catch(err => {
+    .catch((err) => {
       res.status(500).send({
         message:
-          err.message || "Some error occurred while removing all patients."
+          err.message || "Some error occurred while removing all patients.",
       });
     });
 };
-

@@ -17,6 +17,8 @@ exports.create = async (req, res) => {
   const password = bcrypt.hash(req.body.password.toString(), 10);
 
   const user = new User({
+    name: req.body.name,
+    lastname: req.body.lastname,
     email: req.body.email,
     password: password,
   });
@@ -110,14 +112,11 @@ exports.update = (req, res) => {
 
 // Retrieve all Users from the database.
 exports.findAll = (req, res) => {
-  const { page, size, search } = req.query;
+  const { page, size, search, searchBy } = req.query;
+  const condition = (search && searchBy) ? { [searchBy]: { [Op.like]: `%${search}%` } } : null;
   const { offset, limit } = calculateLimitAndOffset(page, size);
   User.findAndCountAll({
-    where: {
-      email: {
-        [Op.like]: `%${search}%`,
-      },
-    },
+    where: condition,
     limit: limit,
     offset: offset,
     include: [
@@ -162,10 +161,7 @@ exports.findOne = async (req, res) => {
     ],
   });
   if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
-  res.json({
-    error: null,
-    data: { user },
-  });
+  res.send(user);
 };
 
 // Find a single User with an id
@@ -200,10 +196,7 @@ exports.login = async (req, res) => {
     httpOnly: true,
     expires: new Date(Date.now() + maxAge),
   });
-  res.json({
-    error: null,
-    data: { email: user.email, user_id: user.id, roles: user.roles },
-  });
+  res.send(user);
 };
 
 exports.profile = async (req, res) => {
@@ -220,8 +213,5 @@ exports.profile = async (req, res) => {
     ],
   });
   if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
-  res.json({
-    error: null,
-    data: { user },
-  });
+  res.send(user);
 };

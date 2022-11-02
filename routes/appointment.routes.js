@@ -12,6 +12,9 @@ module.exports = app => {
   // Retrieve all Appointments
   router.get("/all", permit('admin', 'worker'), appointments.findAll);
 
+// Retrieve all Appointments
+  router.get("/all/:id", permit('admin', 'worker'), appointments.findByUserId);
+
   // Retrieve a single Appointment with id
   router.get("/:id", permit('admin', 'worker'), appointments.findOne);
 
@@ -23,5 +26,6 @@ module.exports = app => {
 
   // Delete all Appointments
   router.delete("/", permit('admin', 'worker'), appointments.deleteAll);
+
   app.use('/api/appointments', router);
 };
