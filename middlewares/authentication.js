@@ -4,7 +4,8 @@ require("dotenv").config();
 // middleware for authentication
 async function authenticate(req, res, next) {
   const authCookie = req.cookies.token;
-  if (req.path === "/api/users/login") {
+  // check if public is in the path
+  if (req.path.includes("public")) {
     next();
   } else {
     if (authCookie == null) return res.sendStatus(401);

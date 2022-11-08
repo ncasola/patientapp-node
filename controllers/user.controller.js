@@ -24,16 +24,10 @@ exports.create = async (req, res) => {
   });
   try {
     // save user with roles
-    const userRoles = req.body.roles;
+    const userRole = req.body.role;
     const savedUser = user.save();
-    const roles = await Roles.findAll({
-      where: {
-        name: {
-          [Op.or]: userRoles,
-        },
-      },
-    });
-    await savedUser.setRoles(roles);
+    const role = await Roles.findByPk(userRole);
+    await savedUser.setRoles(role);
     res.json({
       error: null,
       data: savedUser,
@@ -86,28 +80,30 @@ exports.deleteAll = (req, res) => {
 
 // Update a User by the id in the request
 
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
   const id = req.params.id;
-
-  User.update(req.body, {
-    where: { id: id },
-  })
-    .then((num) => {
-      if (num == 1) {
-        res.send({
-          message: "User was updated successfully.",
-        });
-      } else {
-        res.send({
-          message: `Cannot update User with id=${id}. Maybe User was not found or req.body is empty!`,
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: "Error updating User with id=" + id,
-      });
-    });
+  const user = await User.findByPk(req.params.id, {
+    include: [
+      {
+        model: Roles,
+        as: "roles",
+        attributes: ["id", "name"],
+        through: {
+          attributes: [],
+        },
+      },
+    ],
+  });
+  if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
+  // update all user attributes which match the ones from the request
+  const updatedUser = await user.update(req.body);
+  // update user roles
+  const userRole = req.body.role;
+  const role = await Roles.findByPk(userRole);
+  await updatedUser.setRoles(role);
+  return res.send({
+    message: "Patient was updated successfully.",
+  });
 };
 
 // Retrieve all Users from the database.
@@ -167,6 +163,7 @@ exports.findOne = async (req, res) => {
 // Find a single User with an id
 exports.login = async (req, res) => {
   const user = await User.findOne({
+    attributes: ["id", "name", "lastname", "email", "password"],
     include: [
       {
         model: Roles,
@@ -196,11 +193,14 @@ exports.login = async (req, res) => {
     httpOnly: true,
     expires: new Date(Date.now() + maxAge),
   });
+  // delete password from response
+  delete user.password;
   res.send(user);
 };
 
 exports.profile = async (req, res) => {
-  const user = await User.findByPk(req.user.user_id, {
+  const userId = req.user.user_id;
+  const user = await User.findByPk(userId, {
     include: [
       {
         model: Roles,
@@ -212,6 +212,14 @@ exports.profile = async (req, res) => {
       },
     ],
   });
-  if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
-  res.send(user);
+  if (!user) return res.status(400).json({ error: "Usuario no encontrado", info: userId});
+  // update all user attributes which match the ones from the request
+  const updatedUser = await user.update(req.body);
+  // update user roles
+  const userRole = req.body.role;
+  const role = await Roles.findByPk(userRole);
+  await updatedUser.setRoles(role);
+  return res.send({
+    message: "Patient was updated successfully.",
+  });
 };

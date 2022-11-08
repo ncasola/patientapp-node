@@ -7,8 +7,8 @@ module.exports = (app) => {
   // Create a new User
   router.post("/", permit("admin"), users.create);
 
-  // Login Users
-  router.post("/login", users.login);
+  // Public routes
+  router.post("/public/login", users.login);
 
   // Retrieve all Users
   router.get("/", permit("admin"), users.findAll);
@@ -26,7 +26,7 @@ module.exports = (app) => {
   router.delete("/", permit("admin"), users.deleteAll);
 
   // Profile
-  router.get("/profile", permit("worker"), users.profile);
+  router.post("/profile", permit('admin', 'worker'), users.profile);
 
   app.use("/api/users", router);
 };
