@@ -10,17 +10,7 @@ const config = require(__dirname + '/../config/config.js')[env];
 const db = {};
 
 let sequelize;
-if(env === 'production'){
-    sequelize = new Sequelize(config.database, config.username, config.password, {
-        host: config.host,
-        dialect: config.dialect,
-        dialectOptions: {
-            ssl: true,
-        }
-    });
-} else {
-    sequelize = new Sequelize(config);
-}
+sequelize = new Sequelize(config);
 
 fs
   .readdirSync(__dirname)

@@ -1,5 +1,4 @@
 "use strict";
-
 module.exports = {
   development: {
     dialect: "sqlite",

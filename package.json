@@ -1,7 +1,7 @@
 {
-  "name": "library-back",
+  "name": "patientapp-node",
   "version": "1.0.0",
-  "description": "",
+  "description": "node app for patientapp",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",

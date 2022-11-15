@@ -6,17 +6,16 @@ const bcrypt = require("bcrypt");
 module.exports = {
   async up(queryInterface, Sequelize) {
     const password = await bcrypt.hash("123456", 10);
-    const users = [...Array(2)].map( () => (
+    const users = [...Array(1)].map( () => (
       {
         name: faker.name.firstName(),
         lastname: faker.name.lastName(),
-        email: faker.internet.email(),
+        email: "ncasolajimenez@gmail.com",
         password: password,
         createdAt: new Date(),
         updatedAt: new Date()
       }
     ));
-    console.log(users);
     await queryInterface.bulkInsert("users", users, {});
   },
 
