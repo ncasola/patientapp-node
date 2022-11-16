@@ -1,5 +1,6 @@
 FROM node:16
-
+ARG MIGRATE
+ARG SEED
 # Create app directory
 WORKDIR /usr/src/app
 
@@ -15,9 +16,9 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-# run npx sequelize-cli db:migrate
-RUN npx sequelize-cli db:migrate
-RUN npx sequelize-cli db:seed:all
+RUN If ($MIGRATE -eq "true") { npx sequelize-cli db:migrate } Else { echo "Migration skipped" }
+RUN If ($SEED -eq "true") { npx sequelize-cli db:seed:all } Else { echo "Seed skipped" }
+
 
 EXPOSE 3001
 CMD [ "npm", "start" ]

@@ -44,6 +44,7 @@ exports.findAllPaged = (req, res) => {
     limit: limit,
     offset: offset,
     include: Patient,
+    distinct: true,
     where: {
       dateAppointmentStart: {
         [Op.gt]: new Date(),

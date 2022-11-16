@@ -115,6 +115,7 @@ exports.findAll = (req, res) => {
     where: condition,
     limit: limit,
     offset: offset,
+    distinct: true,
     include: [
       {
         model: Roles,

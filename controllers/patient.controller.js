@@ -51,6 +51,7 @@ exports.findAllPaged = (req, res) => {
     where: condition,
     limit: limit,
     offset: offset,
+    distinct: true,
     include: Appointment,
   })
     .then((data) => {
