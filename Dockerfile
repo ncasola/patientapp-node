@@ -1,24 +1,19 @@
-FROM node:16
-ARG MIGRATE
-ARG SEED
-# Create app directory
+ARG VERSION
+
+FROM node:16 as base
 WORKDIR /usr/src/app
-
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
 COPY package*.json ./
-
 RUN npm install
-# If you are building your code for production
-# RUN npm ci --only=production
-
-# Bundle app source
 COPY . .
 
-RUN If ($MIGRATE -eq "true") { npx sequelize-cli db:migrate } Else { echo "Migration skipped" }
-RUN If ($SEED -eq "true") { npx sequelize-cli db:seed:all } Else { echo "Seed skipped" }
+FROM base AS branch-version-1
+RUN rm -rf database.sqlite && touch database.sqlite
+RUN npx sequelize-cli db:migrate
+RUN npx sequelize-cli db:seed:all
 
+FROM base AS branch-version-2
+RUN echo "Keep database"
 
+FROM branch-version-${VERSION} AS final
 EXPOSE 3001
 CMD [ "npm", "start" ]
