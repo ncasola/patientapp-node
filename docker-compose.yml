@@ -2,8 +2,6 @@ version: "3"
 services:
   api:
     build: .
-    ports:
-      - "3001:3001"
     environment:
       VIRTUAL_HOST: patientapp.ncasola.cloud
       LETSENCRYPT_HOST: patientapp.ncasola.cloud

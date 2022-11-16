@@ -5,10 +5,12 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config();
 const authenticate = require('./middlewares/authentication');
 const port = process.env.PORT || 3001;
+const origin = process.env.ORIGIN || 'http://localhost:3000';
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
+    origin: origin,
     credentials: true
 }));
 app.use(cookieParser());
